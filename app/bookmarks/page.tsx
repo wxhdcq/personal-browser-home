@@ -6,8 +6,8 @@ export default function BookmarksPage() {
   return (
     <AppFrame>
       <PageHeader
-        title="书签"
-        description="管理自己的常用网站。第一版使用本地数据和 localStorage，后续可替换为 chrome.bookmarks。"
+        title="快捷入口管理"
+        description="管理首页右侧快捷入口，支持新增、编辑、删除和调整顺序，数据保存在本地浏览器。"
       />
       <BookmarkManager />
     </AppFrame>

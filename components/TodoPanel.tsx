@@ -2,9 +2,9 @@
 
 import { Check, Plus, Square, Trash2 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { SurfaceCard } from "@/components/SurfaceCard";
 import { storageKeys } from "@/data/storageKeys";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { SurfaceCard } from "@/components/SurfaceCard";
 import type { TodoItem } from "@/types/home";
 
 function createTodo(title: string): TodoItem {
@@ -20,7 +20,7 @@ function createTodo(title: string): TodoItem {
 }
 
 function todoTime(index: number) {
-  return ["今天 10:00", "今天 14:00", "今天 18:00", "明天 09:00"][index % 4];
+  return ["09:00", "12:00", "15:00", "20:00"][index % 4];
 }
 
 export function TodoPanel() {
@@ -56,12 +56,12 @@ export function TodoPanel() {
   }
 
   return (
-    <SurfaceCard>
+    <SurfaceCard id="today-todo" className="h-full">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">待办事项</h2>
+          <h2 className="text-lg font-semibold text-foreground">今日待办</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isLoaded ? `${completedCount} 项完成` : "正在读取本地数据"}
+            {isLoaded ? `已完成 ${completedCount} / ${todos.length}` : "读取中"}
           </p>
         </div>
         <button
@@ -70,7 +70,7 @@ export function TodoPanel() {
           className="inline-flex h-9 items-center gap-1 rounded-lg bg-primary/10 px-3 text-sm font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
         >
           <Plus aria-hidden size={16} />
-          添加任务
+          添加
         </button>
       </div>
 
@@ -89,7 +89,7 @@ export function TodoPanel() {
             今天还没有待办
           </div>
         ) : (
-          todos.map((todo, index) => (
+          todos.slice(0, 5).map((todo, index) => (
             <div key={todo.id} className="group flex items-center gap-3">
               <button
                 type="button"
@@ -119,7 +119,7 @@ export function TodoPanel() {
                 {todo.title}
               </span>
               <span className="hidden shrink-0 text-sm text-muted-foreground sm:block">
-                {todo.completed ? "已完成" : todoTime(index)}
+                {todo.completed ? "完成" : todoTime(index)}
               </span>
               <button
                 type="button"

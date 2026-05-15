@@ -56,7 +56,7 @@ export function FocusTimer() {
         <span className="py-2 text-center">倒计时</span>
       </div>
 
-      <p className="mt-8 text-center font-mono text-6xl font-semibold tracking-normal text-foreground">
+      <p className="mt-8 text-center font-mono text-5xl font-semibold tracking-normal text-foreground">
         {label}
       </p>
 
@@ -64,10 +64,10 @@ export function FocusTimer() {
         <button
           type="button"
           onClick={() => setRunning((current) => !current)}
-          className="inline-flex h-11 min-w-36 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary-strong"
+          className="inline-flex h-11 min-w-32 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary-strong"
         >
           {running ? <Pause aria-hidden size={18} /> : <Play aria-hidden size={18} />}
-          {running ? "暂停" : "开始专注"}
+          {running ? "暂停" : "开始"}
         </button>
         <button
           type="button"

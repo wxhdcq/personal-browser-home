@@ -16,9 +16,18 @@ function getClockSnapshot() {
 function getGreeting(date: Date) {
   const hour = date.getHours();
   if (hour < 6) return "夜深了";
-  if (hour < 12) return "早上好";
+  if (hour < 12) return "早安";
   if (hour < 18) return "下午好";
   return "晚上好";
+}
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  }).format(date);
 }
 
 export function ClockGreeting() {
@@ -28,19 +37,21 @@ export function ClockGreeting() {
     () => emptyClockSnapshot,
   );
 
-  const greeting = useMemo(() => {
-    if (!timestamp) return "你好";
-    const now = new Date(timestamp * 60_000);
-    return getGreeting(now);
+  const current = useMemo(() => {
+    const now = timestamp ? new Date(timestamp * 60_000) : new Date();
+    return {
+      greeting: getGreeting(now),
+      date: formatDate(now),
+    };
   }, [timestamp]);
 
   return (
-    <section className="pt-2 text-center sm:pt-0">
-      <h1 className="whitespace-nowrap text-[24px] font-bold leading-tight tracking-normal text-foreground min-[410px]:text-[25px] sm:text-4xl">
-        {greeting}，专注让今天变得更有意义
+    <section className="text-center">
+      <h1 className="text-[30px] font-bold leading-tight tracking-normal text-foreground sm:text-4xl">
+        {current.greeting}，今天也要元气满满哦！
       </h1>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground sm:mt-5 sm:text-base">
-        保持好奇，保持学习，保持成长。
+      <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+        {current.date} · 保持好奇，保持学习，保持成长。
       </p>
     </section>
   );

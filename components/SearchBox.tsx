@@ -18,6 +18,8 @@ import type { SearchEngine, SearchEngineId, UserSettings } from "@/types/home";
 
 interface SearchBoxProps {
   engines: SearchEngine[];
+  showEngines?: boolean;
+  className?: string;
 }
 
 function buildSearchUrl(template: string, query: string) {
@@ -39,7 +41,11 @@ function engineIconUrl(engine: SearchEngine) {
   }
 }
 
-export function SearchBox({ engines }: SearchBoxProps) {
+export function SearchBox({
+  engines,
+  showEngines = true,
+  className = "",
+}: SearchBoxProps) {
   const [query, setQuery] = useState("");
   const [engineId, setEngineId] = useState<SearchEngineId | null>(null);
   const [settings] = useLocalStorage<UserSettings>(
@@ -74,7 +80,7 @@ export function SearchBox({ engines }: SearchBoxProps) {
 
   function runSearch() {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery) return;
+    if (!trimmedQuery || !selectedEngine) return;
 
     if (looksLikeUrl(trimmedQuery)) {
       window.location.href = /^https?:\/\//i.test(trimmedQuery)
@@ -104,7 +110,11 @@ export function SearchBox({ engines }: SearchBoxProps) {
   }
 
   return (
-    <section className="mx-auto w-full max-w-[760px]">
+    <section
+      className={["mx-auto w-full max-w-[760px]", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <form
         onSubmit={handleSubmit}
         className="flex h-14 items-center gap-3 rounded-full border border-border bg-card px-4 shadow-[0_18px_50px_rgba(15,23,42,0.08)] transition focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/10 sm:h-16 sm:px-5"
@@ -133,50 +143,52 @@ export function SearchBox({ engines }: SearchBoxProps) {
         </button>
       </form>
 
-      <div
-        className="mt-5 grid grid-cols-4 gap-2 pb-1 sm:mt-7 sm:flex sm:justify-center sm:gap-3 sm:overflow-x-auto"
-        role="tablist"
-        aria-label="搜索引擎"
-      >
-        {engines.map((engine) => {
-          const isActive = engine.id === effectiveEngineId;
-          const iconUrl = engineIconUrl(engine);
-          return (
-            <button
-              key={engine.id}
-              type="button"
-              onClick={() => setEngineId(engine.id)}
-              className={[
-                "inline-flex h-12 min-w-0 items-center justify-center gap-1 rounded-2xl border px-1.5 py-2 text-[11px] font-medium shadow-sm transition sm:h-11 sm:shrink-0 sm:gap-2 sm:rounded-full sm:pl-3 sm:pr-4 sm:text-sm",
-                isActive
-                  ? "border-primary/20 bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-primary/30 hover:text-primary",
-              ].join(" ")}
-              role="tab"
-              aria-selected={isActive}
-            >
-              {iconUrl ? (
-                <span
-                  className={[
-                    "inline-flex h-5 w-5 items-center justify-center rounded-full sm:h-6 sm:w-6",
-                    isActive ? "bg-white" : "bg-background",
-                  ].join(" ")}
-                >
-                  <Image
-                    src={iconUrl}
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="h-3.5 w-3.5 rounded-sm object-contain sm:h-4 sm:w-4"
-                    unoptimized
-                  />
-                </span>
-              ) : null}
-              <span className="whitespace-nowrap">{engine.name}</span>
-            </button>
-          );
-        })}
-      </div>
+      {showEngines ? (
+        <div
+          className="mt-5 grid grid-cols-4 gap-2 pb-1 sm:mt-7 sm:flex sm:justify-center sm:gap-3 sm:overflow-x-auto"
+          role="tablist"
+          aria-label="搜索引擎"
+        >
+          {engines.map((engine) => {
+            const isActive = engine.id === effectiveEngineId;
+            const iconUrl = engineIconUrl(engine);
+            return (
+              <button
+                key={engine.id}
+                type="button"
+                onClick={() => setEngineId(engine.id)}
+                className={[
+                  "inline-flex h-12 min-w-0 items-center justify-center gap-1 rounded-2xl border px-1.5 py-2 text-[11px] font-medium shadow-sm transition sm:h-11 sm:shrink-0 sm:gap-2 sm:rounded-full sm:pl-3 sm:pr-4 sm:text-sm",
+                  isActive
+                    ? "border-primary/20 bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground hover:border-primary/30 hover:text-primary",
+                ].join(" ")}
+                role="tab"
+                aria-selected={isActive}
+              >
+                {iconUrl ? (
+                  <span
+                    className={[
+                      "inline-flex h-5 w-5 items-center justify-center rounded-full sm:h-6 sm:w-6",
+                      isActive ? "bg-white" : "bg-background",
+                    ].join(" ")}
+                  >
+                    <Image
+                      src={iconUrl}
+                      alt=""
+                      width={16}
+                      height={16}
+                      className="h-3.5 w-3.5 rounded-sm object-contain sm:h-4 sm:w-4"
+                      unoptimized
+                    />
+                  </span>
+                ) : null}
+                <span className="whitespace-nowrap">{engine.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </section>
   );
 }

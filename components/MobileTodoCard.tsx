@@ -1,12 +1,12 @@
 "use client";
 
 import { Check, ClipboardCheck } from "lucide-react";
+import { SurfaceCard } from "@/components/SurfaceCard";
 import { storageKeys } from "@/data/storageKeys";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { SurfaceCard } from "@/components/SurfaceCard";
 import type { TodoItem } from "@/types/home";
 
-const previewTodos = ["完成产品需求评审", "回复重要邮件", "学习设计规范更新"];
+const previewTodos = ["完成产品需求", "健身锻炼", "学习新知识"];
 
 export function MobileTodoCard() {
   const [todos, setTodos] = useLocalStorage<TodoItem[]>(storageKeys.todos, []);
@@ -31,18 +31,18 @@ export function MobileTodoCard() {
   }
 
   return (
-    <SurfaceCard id="today-todo" className="min-h-[218px]">
-      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-        <ClipboardCheck aria-hidden size={19} className="text-primary" />
+    <SurfaceCard id="today-todo" padding="sm">
+      <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+        <ClipboardCheck aria-hidden size={18} className="text-primary" />
         今日待办
       </h2>
-      <div className="mt-6 space-y-5">
+      <div className="mt-4 space-y-3">
         {visibleTodos.map((todo) => (
           <button
             key={todo.id}
             type="button"
             onClick={() => toggleTodo(todo.id)}
-            className="flex w-full items-center gap-3 text-left text-sm text-foreground disabled:cursor-default"
+            className="flex w-full items-center gap-3 text-left text-sm text-foreground"
           >
             <span
               className={[

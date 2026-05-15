@@ -1,5 +1,6 @@
 export const storageKeys = {
   bookmarks: "personal-home.bookmarks.v1",
+  shortcuts: "personal-home.shortcuts.v2",
   history: "personal-home.history.v1",
   notes: "personal-home.notes.v1",
   quickNote: "personal-home.quick-note.v1",

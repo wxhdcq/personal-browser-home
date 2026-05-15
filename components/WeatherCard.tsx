@@ -13,20 +13,32 @@ import {
   Sun,
   Wind,
 } from "lucide-react";
+import { SurfaceCard } from "@/components/SurfaceCard";
 import { defaultSettings } from "@/data/settings";
 import { storageKeys } from "@/data/storageKeys";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useWeather } from "@/hooks/useWeather";
-import { SurfaceCard } from "@/components/SurfaceCard";
 import type { UserSettings, WeatherSnapshot } from "@/types/home";
+
+interface WeatherCardProps {
+  variant?: "full" | "compact";
+}
 
 function WeatherIcon({ weather }: { weather?: WeatherSnapshot }) {
   if (!weather) return <Cloud aria-hidden size={28} />;
   if (weather.weatherCode === 0) {
-    return weather.isDay ? <Sun aria-hidden size={28} /> : <CloudSun aria-hidden size={28} />;
+    return weather.isDay ? (
+      <Sun aria-hidden size={28} />
+    ) : (
+      <CloudSun aria-hidden size={28} />
+    );
   }
-  if ([1, 2, 3].includes(weather.weatherCode)) return <CloudSun aria-hidden size={28} />;
-  if ([45, 48].includes(weather.weatherCode)) return <CloudFog aria-hidden size={28} />;
+  if ([1, 2, 3].includes(weather.weatherCode)) {
+    return <CloudSun aria-hidden size={28} />;
+  }
+  if ([45, 48].includes(weather.weatherCode)) {
+    return <CloudFog aria-hidden size={28} />;
+  }
   if ([61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(weather.weatherCode)) {
     return <CloudRain aria-hidden size={28} />;
   }
@@ -49,35 +61,77 @@ function observedAt(value?: string) {
   }).format(new Date(value));
 }
 
-export function WeatherCard() {
+export function WeatherCard({ variant = "full" }: WeatherCardProps) {
   const [settings] = useLocalStorage<UserSettings>(
     storageKeys.settings,
     defaultSettings,
   );
   const weather = useWeather(settings.weatherLocation);
   const data = weather.data;
+  const icon =
+    weather.status === "loading" && !data ? (
+      <LoaderCircle aria-hidden size={28} className="animate-spin" />
+    ) : weather.status === "error" && !data ? (
+      <AlertTriangle aria-hidden size={28} />
+    ) : (
+      <WeatherIcon weather={data} />
+    );
 
-  return (
-    <SurfaceCard>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            {weather.status === "loading" && !data ? (
-              <LoaderCircle aria-hidden size={28} className="animate-spin" />
-            ) : weather.status === "error" && !data ? (
-              <AlertTriangle aria-hidden size={28} />
-            ) : (
-              <WeatherIcon weather={data} />
-            )}
-          </span>
+  if (variant === "compact") {
+    return (
+      <SurfaceCard padding="sm">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              {icon}
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-foreground">天气</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {data?.locationLabel ?? settings.weatherLocation}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={weather.refresh}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-background hover:text-primary"
+            aria-label="刷新天气"
+            title="刷新"
+          >
+            <RefreshCw
+              aria-hidden
+              size={16}
+              className={weather.status === "loading" ? "animate-spin" : ""}
+            />
+          </button>
+        </div>
+        <div className="mt-4 flex items-end justify-between gap-3">
           <div>
-            <p className="text-2xl font-semibold text-foreground">
+            <p className="text-4xl font-semibold leading-none text-foreground">
               {temp(data?.temperature)}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               {data?.weatherText ?? "加载中"}
             </p>
           </div>
+          <p className="text-right text-xs text-muted-foreground">
+            {weather.status === "error" ? "本地缓存" : observedAt(data?.observedAt)}
+          </p>
+        </div>
+      </SurfaceCard>
+    );
+  }
+
+  return (
+    <SurfaceCard className="h-full">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">天气</h2>
+          <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+            <MapPin aria-hidden size={15} />
+            {data?.locationLabel ?? settings.weatherLocation}
+          </p>
         </div>
         <button
           type="button"
@@ -94,48 +148,51 @@ export function WeatherCard() {
         </button>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-        <p>
-          体感 <span className="text-foreground">{temp(data?.apparentTemperature)}</span>
+      <div className="mt-6 flex items-center gap-4">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          {icon}
+        </span>
+        <div>
+          <p className="text-4xl font-semibold leading-none text-foreground">
+            {temp(data?.temperature)}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {data?.weatherText ?? "加载中"}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
+        <p className="rounded-lg bg-background p-3 text-muted-foreground">
+          湿度
+          <span className="mt-1 block font-semibold text-foreground">
+            {data?.humidity ?? "--"}%
+          </span>
         </p>
-        <p>
-          湿度 <span className="text-foreground">{data?.humidity ?? "--"}%</span>
+        <p className="rounded-lg bg-background p-3 text-muted-foreground">
+          风速
+          <span className="mt-1 block font-semibold text-foreground">
+            {data ? `${Math.round(data.windSpeed)} km/h` : "--"}
+          </span>
         </p>
-        <p className="inline-flex items-center gap-1">
-          <Wind aria-hidden size={15} />
-          <span>{data ? `${Math.round(data.windSpeed)} km/h` : "--"}</span>
-        </p>
-        <p>
-          空气{" "}
-          <span className="text-foreground">
+        <p className="rounded-lg bg-background p-3 text-muted-foreground">
+          空气
+          <span className="mt-1 block truncate font-semibold text-foreground">
             {data?.airQualityText ?? "--"}
-            {data?.airQualityIndex !== undefined ? ` ${data.airQualityIndex}` : ""}
           </span>
         </p>
       </div>
 
-      <div className="mt-4 space-y-1 text-right text-xs text-muted-foreground">
-        <p className="flex items-center justify-end gap-1 text-primary">
-          <MapPin aria-hidden size={15} />
-          {data?.locationLabel ?? settings.weatherLocation}
-        </p>
-        <p>
-          {weather.status === "error" ? (
-            weather.error
-          ) : (
-            <>
-              <a
-                href="https://open-meteo.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary"
-              >
-                Open-Meteo
-              </a>{" "}
-              · {observedAt(data?.observedAt)} 更新
-            </>
-          )}
-        </p>
+      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <Wind aria-hidden size={14} />
+          体感 {temp(data?.apparentTemperature)}
+        </span>
+        <span>
+          {weather.status === "error"
+            ? weather.error
+            : `Open-Meteo · ${observedAt(data?.observedAt)} 更新`}
+        </span>
       </div>
     </SurfaceCard>
   );

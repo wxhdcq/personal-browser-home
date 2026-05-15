@@ -16,7 +16,7 @@ export function DailyQuoteCard({ variant = "full" }: DailyQuoteCardProps) {
           每日一句
         </h2>
         <p className="mt-8 text-base leading-8 text-foreground">
-          你所看到的惊艳，都曾被平庸磨炼。
+          你所看到的惊艳，都曾被平庸历练。
         </p>
         <p className="mt-5 text-right text-sm text-muted-foreground">—— 佚名</p>
       </SurfaceCard>

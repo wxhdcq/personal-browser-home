@@ -1,25 +1,18 @@
 "use client";
 
-import { useModulePreferences } from "@/hooks/useModulePreferences";
-import { FocusTimer } from "@/components/FocusTimer";
-import { ShortcutGrid } from "@/components/ShortcutGrid";
+import { QuickNotePanel } from "@/components/QuickNotePanel";
 import { TodoPanel } from "@/components/TodoPanel";
-import type { ShortcutLink } from "@/types/home";
+import { WeatherCard } from "@/components/WeatherCard";
+import { useModulePreferences } from "@/hooks/useModulePreferences";
 
-interface HomeDashboardProps {
-  shortcuts: ShortcutLink[];
-}
-
-export function HomeDashboard({ shortcuts }: HomeDashboardProps) {
+export function HomeDashboard() {
   const { isModuleEnabled } = useModulePreferences();
 
   return (
-    <div className="grid gap-5 sm:gap-8">
-      <ShortcutGrid shortcuts={shortcuts} />
-      <div className="hidden gap-6 sm:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.85fr)]">
-        {isModuleEnabled("todos") ? <TodoPanel /> : null}
-        {isModuleEnabled("focus") ? <FocusTimer /> : null}
-      </div>
-    </div>
+    <section className="grid gap-5 lg:grid-cols-3">
+      {isModuleEnabled("todos") ? <TodoPanel /> : null}
+      {isModuleEnabled("quick-note") ? <QuickNotePanel /> : null}
+      {isModuleEnabled("weather") ? <WeatherCard /> : null}
+    </section>
   );
 }

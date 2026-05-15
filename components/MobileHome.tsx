@@ -1,19 +1,17 @@
-import { DailyQuoteCard } from "@/components/DailyQuoteCard";
 import { MobileTodoCard } from "@/components/MobileTodoCard";
 import { SearchBox } from "@/components/SearchBox";
 import { ShortcutGrid } from "@/components/ShortcutGrid";
+import { WeatherCard } from "@/components/WeatherCard";
 import type { SearchEngine, ShortcutLink } from "@/types/home";
 
 const mobileShortcutIds = [
-  "chatgpt",
   "github",
-  "notion",
-  "youtube",
   "vercel",
-  "tradingview",
+  "youtube",
+  "chatgpt",
+  "notion",
+  "google-translate",
 ];
-
-const mobileEngineIds = ["google", "youtube", "github", "perplexity"];
 
 interface MobileHomeProps {
   engines: SearchEngine[];
@@ -21,21 +19,20 @@ interface MobileHomeProps {
 }
 
 export function MobileHome({ engines, shortcuts }: MobileHomeProps) {
-  const mobileEngines = engines.filter((engine) =>
-    mobileEngineIds.includes(engine.id),
-  );
-  const mobileShortcuts = shortcuts.filter((shortcut) =>
-    mobileShortcutIds.includes(shortcut.id),
-  );
+  const mobileShortcuts = mobileShortcutIds
+    .map((id) => shortcuts.find((shortcut) => shortcut.id === id))
+    .filter((shortcut): shortcut is ShortcutLink => Boolean(shortcut));
 
   return (
-    <div className="grid gap-7 pt-8">
-      <SearchBox engines={mobileEngines} />
-      <ShortcutGrid shortcuts={mobileShortcuts} showManage={false} />
-      <div className="grid grid-cols-2 gap-4">
-        <MobileTodoCard />
-        <DailyQuoteCard variant="compact" />
-      </div>
+    <div className="grid gap-5 pt-2">
+      <SearchBox engines={engines} showEngines={false} />
+      <ShortcutGrid
+        shortcuts={mobileShortcuts}
+        showManage={false}
+        variant="compact"
+      />
+      <MobileTodoCard />
+      <WeatherCard variant="compact" />
     </div>
   );
 }

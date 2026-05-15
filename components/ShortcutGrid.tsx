@@ -10,6 +10,7 @@ import type { ShortcutLink } from "@/types/home";
 interface ShortcutGridProps {
   shortcuts: ShortcutLink[];
   showManage?: boolean;
+  variant?: "default" | "compact";
 }
 
 function faviconUrl(shortcut: ShortcutLink) {
@@ -23,7 +24,12 @@ function faviconUrl(shortcut: ShortcutLink) {
   }
 }
 
-function PlatformIcon({ shortcut }: { shortcut: ShortcutLink }) {
+interface PlatformIconProps {
+  shortcut: ShortcutLink;
+  size?: "sm" | "md";
+}
+
+export function PlatformIcon({ shortcut, size = "md" }: PlatformIconProps) {
   const [failed, setFailed] = useState(false);
   const iconUrl = faviconUrl(shortcut);
 
@@ -37,7 +43,10 @@ function PlatformIcon({ shortcut }: { shortcut: ShortcutLink }) {
       alt=""
       width={32}
       height={32}
-      className="h-7 w-7 rounded-md object-contain"
+      className={[
+        "rounded-md object-contain",
+        size === "sm" ? "h-5 w-5" : "h-7 w-7",
+      ].join(" ")}
       loading="lazy"
       referrerPolicy="no-referrer"
       unoptimized
@@ -49,8 +58,10 @@ function PlatformIcon({ shortcut }: { shortcut: ShortcutLink }) {
 export function ShortcutGrid({
   shortcuts,
   showManage = true,
+  variant = "default",
 }: ShortcutGridProps) {
   const recordHistory = useHistoryRecorder();
+  const isCompact = variant === "compact";
 
   return (
     <section>
@@ -67,7 +78,13 @@ export function ShortcutGrid({
           </Link>
         ) : null}
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-4 2xl:grid-cols-3">
+      <div
+        className={
+          isCompact
+            ? "mt-4 grid grid-cols-3 gap-3"
+            : "mt-5 grid grid-cols-2 gap-4 sm:gap-4 2xl:grid-cols-3"
+        }
+      >
         {shortcuts.map((shortcut) => (
           <a
             key={shortcut.id}
@@ -83,24 +100,45 @@ export function ShortcutGrid({
                 metadata: { category: shortcut.category },
               })
             }
-            className="group flex h-24 items-center gap-2.5 rounded-2xl border border-border bg-card px-3 shadow-[0_14px_35px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_18px_45px_rgba(15,23,42,0.1)] focus:outline-none focus:ring-4 focus:ring-primary/10 sm:h-[88px] sm:gap-4 sm:rounded-lg sm:px-5"
+            className={[
+              "group border border-border bg-card shadow-[0_14px_35px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_18px_45px_rgba(15,23,42,0.1)] focus:outline-none focus:ring-4 focus:ring-primary/10",
+              isCompact
+                ? "flex h-[92px] flex-col items-center justify-center gap-2 rounded-2xl px-2 text-center"
+                : "flex h-24 items-center gap-2.5 rounded-2xl px-3 sm:h-[88px] sm:gap-4 sm:rounded-lg sm:px-5",
+            ].join(" ")}
           >
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-primary sm:rounded-lg">
+            <span
+              className={[
+                "inline-flex shrink-0 items-center justify-center border border-border bg-background text-primary",
+                isCompact
+                  ? "h-11 w-11 rounded-2xl"
+                  : "h-10 w-10 rounded-xl sm:rounded-lg",
+              ].join(" ")}
+            >
               <PlatformIcon shortcut={shortcut} />
             </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold text-foreground">
+            <span className={isCompact ? "min-w-0" : "min-w-0 flex-1"}>
+              <span
+                className={[
+                  "block truncate font-semibold text-foreground",
+                  isCompact ? "max-w-[82px] text-xs" : "text-sm",
+                ].join(" ")}
+              >
                 {shortcut.name}
               </span>
-              <span className="mt-1 block truncate text-xs text-muted-foreground sm:text-sm">
-                {shortcut.description}
-              </span>
+              {!isCompact ? (
+                <span className="mt-1 block truncate text-xs text-muted-foreground sm:text-sm">
+                  {shortcut.description}
+                </span>
+              ) : null}
             </span>
-            <ChevronRight
-              aria-hidden
-              size={15}
-              className="shrink-0 text-soft transition group-hover:text-primary sm:size-4"
-            />
+            {!isCompact ? (
+              <ChevronRight
+                aria-hidden
+                size={15}
+                className="shrink-0 text-soft transition group-hover:text-primary sm:size-4"
+              />
+            ) : null}
           </a>
         ))}
       </div>

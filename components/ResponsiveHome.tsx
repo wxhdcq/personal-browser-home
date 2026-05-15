@@ -2,11 +2,12 @@
 
 import { useSyncExternalStore } from "react";
 import { ClockGreeting } from "@/components/ClockGreeting";
-import { DailyQuoteCard } from "@/components/DailyQuoteCard";
 import { HomeDashboard } from "@/components/HomeDashboard";
 import { HomeSidebar } from "@/components/HomeSidebar";
 import { MobileHome } from "@/components/MobileHome";
 import { SearchBox } from "@/components/SearchBox";
+import { UtilityLinksCard } from "@/components/UtilityLinksCard";
+import { useManagedShortcuts } from "@/hooks/useManagedShortcuts";
 import type { SearchEngine, ShortcutLink } from "@/types/home";
 
 interface ResponsiveHomeProps {
@@ -25,6 +26,8 @@ function getMobileSnapshot() {
 }
 
 export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
+  const [managedShortcuts] = useManagedShortcuts();
+  const visibleShortcuts = managedShortcuts.length > 0 ? managedShortcuts : shortcuts;
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
     getMobileSnapshot,
@@ -32,35 +35,33 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
   );
 
   if (isMobile) {
-    return (
-      <div className="mx-auto max-w-[1450px]">
-        <ClockGreeting />
-        <MobileHome engines={engines} shortcuts={shortcuts} />
-      </div>
-    );
+    return <MobileHome engines={engines} shortcuts={visibleShortcuts} />;
   }
 
   return (
     <div className="mx-auto max-w-[1450px]">
-      <div className="grid items-start gap-8 pt-4 xl:grid-cols-[minmax(0,1fr)_390px]">
+      <div className="grid items-start gap-8 pt-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
-          <ClockGreeting />
+          <section className="pt-3">
+            <ClockGreeting />
+            <div className="mt-7">
+              <SearchBox
+                engines={engines}
+                className="xl:max-w-[900px]"
+              />
+            </div>
+          </section>
+
           <div className="mt-8">
-            <SearchBox engines={engines} />
+            <HomeDashboard />
           </div>
-          <div className="mt-9">
-            <HomeDashboard shortcuts={shortcuts} />
+          <div className="mt-5">
+            <UtilityLinksCard />
           </div>
         </div>
-        <div className="grid gap-6 xl:pt-1">
-          <DailyQuoteCard />
-          <HomeSidebar />
-        </div>
+
+        <HomeSidebar shortcuts={visibleShortcuts} />
       </div>
-      <p className="mt-10 text-center text-sm text-muted-foreground">
-        The best way to predict the future is to create it.
-        <span className="ml-2">— Peter Drucker</span>
-      </p>
     </div>
   );
 }
