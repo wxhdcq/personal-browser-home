@@ -5,6 +5,7 @@ import { storageKeys } from "@/data/storageKeys";
 import type { WeatherSnapshot } from "@/types/home";
 
 const cacheTtlMs = 15 * 60 * 1000;
+
 type WeatherState =
   | { status: "loading"; data?: WeatherSnapshot; error?: undefined }
   | { status: "success"; data: WeatherSnapshot; error?: undefined }
@@ -16,11 +17,10 @@ interface GeocodingResult {
   longitude: number;
   country?: string;
   admin1?: string;
-  admin2?: string;
 }
 
 const fallbackLocation: GeocodingResult = {
-  name: "上海市 浦东新区",
+  name: "浦东新区",
   latitude: 31.23995,
   longitude: 121.50094,
   country: "中国",
@@ -51,19 +51,14 @@ function cacheKey(location: string) {
 }
 
 function readCachedWeather(location: string) {
-  if (typeof window === "undefined") {
-    return undefined;
-  }
+  if (typeof window === "undefined") return undefined;
 
   try {
     const cached = JSON.parse(
       window.localStorage.getItem(cacheKey(location)) ?? "null",
     ) as WeatherSnapshot | null;
 
-    if (!cached) {
-      return undefined;
-    }
-
+    if (!cached) return undefined;
     if (Date.now() - new Date(cached.fetchedAt).getTime() > cacheTtlMs) {
       return undefined;
     }
@@ -83,7 +78,8 @@ function writeCachedWeather(location: string, data: WeatherSnapshot) {
 }
 
 function normalizeLocationCandidates(location: string) {
-  const trimmed = location.trim() || fallbackLocation.name;
+  const trimmed =
+    location.trim() || `${fallbackLocation.admin1} ${fallbackLocation.name}`;
   const parts = trimmed
     .split(/[\s,，]+/)
     .map((part) => part.trim())
@@ -116,18 +112,13 @@ async function geocodeLocation(location: string) {
     url.searchParams.set("format", "json");
 
     const response = await fetch(url);
-
-    if (!response.ok) {
-      continue;
-    }
+    if (!response.ok) continue;
 
     const data = (await response.json()) as { results?: GeocodingResult[] };
     const result =
       data.results?.find((item) => item.country === "中国") ?? data.results?.[0];
 
-    if (result) {
-      return result;
-    }
+    if (result) return result;
   }
 
   return fallbackLocation;
@@ -222,7 +213,7 @@ async function loadWeather(location: string): Promise<WeatherSnapshot> {
 
 export function useWeather(location: string) {
   const normalizedLocation = useMemo(
-    () => location.trim() || fallbackLocation.name,
+    () => location.trim() || `${fallbackLocation.admin1} ${fallbackLocation.name}`,
     [location],
   );
   const [state, setState] = useState<WeatherState>({ status: "loading" });
@@ -231,7 +222,6 @@ export function useWeather(location: string) {
   useEffect(() => {
     let cancelled = false;
     const pendingTimers: number[] = [];
-    const cached = readCachedWeather(normalizedLocation);
     const commitState = (nextState: WeatherState) => {
       const timer = window.setTimeout(() => {
         if (!cancelled) {
@@ -244,6 +234,7 @@ export function useWeather(location: string) {
       cancelled = true;
       pendingTimers.forEach((timer) => window.clearTimeout(timer));
     };
+    const cached = readCachedWeather(normalizedLocation);
 
     if (cached) {
       commitState({ status: "success", data: cached });
@@ -254,18 +245,12 @@ export function useWeather(location: string) {
 
     void loadWeather(normalizedLocation)
       .then((data) => {
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelled) return;
         writeCachedWeather(normalizedLocation, data);
         setState({ status: "success", data });
       })
       .catch((error: unknown) => {
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelled) return;
         setState({
           status: "error",
           data: readCachedWeather(normalizedLocation),

@@ -7,8 +7,8 @@ interface SurfaceCardProps extends ComponentPropsWithoutRef<"section"> {
 }
 
 const paddingClass: Record<SurfacePadding, string> = {
-  sm: "p-4",
-  md: "p-6",
+  sm: "p-3 sm:p-4",
+  md: "p-4 sm:p-6",
   none: "",
 };
 
@@ -22,7 +22,7 @@ export function SurfaceCard({
     <section
       {...props}
       className={[
-        "rounded-lg border border-border bg-card shadow-[0_18px_50px_rgba(15,23,42,0.08)]",
+        "rounded-2xl border border-border bg-card shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:rounded-lg",
         paddingClass[padding],
         className,
       ]

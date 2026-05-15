@@ -5,8 +5,15 @@ import { useMemo, useState } from "react";
 import { downloadResources } from "@/data/downloads";
 import { useHistoryRecorder } from "@/hooks/useHistoryRecorder";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import type { DownloadCategory } from "@/types/home";
 
-const categories = ["全部", "开发工具", "文档资料", "服务器", "常用软件"] as const;
+const categories = [
+  "全部",
+  "开发工具",
+  "文档资料",
+  "服务器",
+  "常用软件",
+] as const;
 
 export function DownloadsPanel() {
   const [query, setQuery] = useState("");
@@ -18,7 +25,7 @@ export function DownloadsPanel() {
 
     return downloadResources.filter((resource) => {
       const matchesCategory =
-        category === "全部" || resource.category === category;
+        category === "全部" || resource.category === (category as DownloadCategory);
       const matchesKeyword =
         !keyword ||
         [resource.name, resource.description, resource.url]

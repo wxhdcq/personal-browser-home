@@ -5,7 +5,7 @@ export const searchEngines: SearchEngine[] = [
     id: "google",
     name: "Google",
     iconUrl: "https://www.google.com/s2/favicons?domain=google.com&sz=64",
-    placeholder: "用 Google 搜索，或输入网址",
+    placeholder: "搜索或输入网址",
     urlTemplate: "https://www.google.com/search?q={query}",
   },
   {

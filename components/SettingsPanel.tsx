@@ -37,9 +37,7 @@ export function SettingsPanel() {
       const parsed = JSON.parse(dataText) as Record<string, string | null>;
 
       localStorageKeys.forEach((key) => {
-        if (!(key in parsed)) {
-          return;
-        }
+        if (!(key in parsed)) return;
 
         if (parsed[key] === null) {
           window.localStorage.removeItem(key);
@@ -56,7 +54,7 @@ export function SettingsPanel() {
 
       setStatus("导入完成，刷新页面后全部模块会读取新数据");
     } catch {
-      setStatus("导入失败：JSON 格式不正确");
+      setStatus("导入失败，JSON 格式不正确");
     }
   }
 
@@ -89,25 +87,6 @@ export function SettingsPanel() {
 
           <label className="space-y-2">
             <span className="text-sm font-medium text-foreground">
-              首页密度
-            </span>
-            <select
-              value={settings.density}
-              onChange={(event) =>
-                setSettings((current) => ({
-                  ...current,
-                  density: event.target.value as UserSettings["density"],
-                }))
-              }
-              className="h-11 w-full rounded-lg border border-border bg-elevated/70 px-3 text-sm outline-none focus:border-primary/70 focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="comfortable">舒适</option>
-              <option value="compact">紧凑</option>
-            </select>
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-foreground">
               天气位置
             </span>
             <input
@@ -120,26 +99,6 @@ export function SettingsPanel() {
               }
               className="h-11 w-full rounded-lg border border-border bg-elevated/70 px-3 text-sm outline-none focus:border-primary/70 focus:ring-2 focus:ring-primary/20"
             />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-foreground">
-              行情数据源
-            </span>
-            <select
-              value={settings.marketApiProvider}
-              onChange={(event) =>
-                setSettings((current) => ({
-                  ...current,
-                  marketApiProvider: event.target
-                    .value as UserSettings["marketApiProvider"],
-                }))
-              }
-              className="h-11 w-full rounded-lg border border-border bg-elevated/70 px-3 text-sm outline-none focus:border-primary/70 focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="static">静态数据</option>
-              <option value="future-api">预留 API</option>
-            </select>
           </label>
         </div>
 
@@ -165,28 +124,6 @@ export function SettingsPanel() {
               className="h-5 w-5 accent-primary"
             />
           </label>
-
-          <label className="flex items-center justify-between rounded-lg border border-border bg-elevated/70 p-4">
-            <span>
-              <span className="block text-sm font-medium text-foreground">
-                新标签打开链接
-              </span>
-              <span className="mt-1 block text-xs text-muted-foreground">
-                当前页面先保留为配置项，扩展版会统一接入。
-              </span>
-            </span>
-            <input
-              type="checkbox"
-              checked={settings.openLinksInNewTab}
-              onChange={(event) =>
-                setSettings((current) => ({
-                  ...current,
-                  openLinksInNewTab: event.target.checked,
-                }))
-              }
-              className="h-5 w-5 accent-primary"
-            />
-          </label>
         </div>
       </SurfaceCard>
 
@@ -195,8 +132,8 @@ export function SettingsPanel() {
           本地数据导入/导出
         </h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          这里会导出书签、历史、笔记、待办、模块和设置。后续改成 Chrome 扩展时，可切换到
-          chrome.storage.sync。
+          这里会导出书签、历史、笔记、待办、模块和设置。后续改成 Chrome
+          扩展时，可以切换到 chrome.storage.sync。
         </p>
         <div className="mt-4 flex gap-2">
           <button

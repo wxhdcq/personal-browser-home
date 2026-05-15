@@ -102,7 +102,11 @@ export function TodoPanel() {
                 ].join(" ")}
                 aria-label={todo.completed ? "标记为未完成" : "标记为完成"}
               >
-                {todo.completed ? <Check aria-hidden size={14} /> : <Square aria-hidden size={1} />}
+                {todo.completed ? (
+                  <Check aria-hidden size={14} />
+                ) : (
+                  <Square aria-hidden size={1} />
+                )}
               </button>
               <span
                 className={[

@@ -58,13 +58,6 @@ export const shortcuts: ShortcutLink[] = [
     category: "服务器",
   },
   {
-    id: "perplexity",
-    name: "Perplexity",
-    url: "https://www.perplexity.ai",
-    description: "智能搜索",
-    category: "AI 工具",
-  },
-  {
     id: "claude",
     name: "Claude",
     url: "https://claude.ai",
@@ -77,6 +70,13 @@ export const shortcuts: ShortcutLink[] = [
     url: "https://www.tradingview.com",
     description: "图表分析",
     category: "投资",
+  },
+  {
+    id: "perplexity",
+    name: "Perplexity",
+    url: "https://www.perplexity.ai",
+    description: "智能搜索",
+    category: "AI 工具",
   },
   {
     id: "yahoo-finance",

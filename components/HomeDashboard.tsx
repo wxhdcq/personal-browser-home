@@ -14,9 +14,9 @@ export function HomeDashboard({ shortcuts }: HomeDashboardProps) {
   const { isModuleEnabled } = useModulePreferences();
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-5 sm:gap-8">
       <ShortcutGrid shortcuts={shortcuts} />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.85fr)]">
+      <div className="hidden gap-6 sm:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.85fr)]">
         {isModuleEnabled("todos") ? <TodoPanel /> : null}
         {isModuleEnabled("focus") ? <FocusTimer /> : null}
       </div>

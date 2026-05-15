@@ -51,12 +51,14 @@ export interface HistoryEntry {
   };
 }
 
+export type DownloadCategory = "开发工具" | "文档资料" | "服务器" | "常用软件";
+
 export interface DownloadResource {
   id: string;
   name: string;
   url: string;
   description: string;
-  category: "开发工具" | "文档资料" | "服务器" | "常用软件";
+  category: DownloadCategory;
   sizeLabel: string;
   updatedAt: string;
 }
@@ -85,7 +87,7 @@ export interface TodoItem {
 }
 
 export type InvestmentTrend = "up" | "down" | "flat";
-export type InvestmentQuoteSource = "static" | "stooq";
+type InvestmentQuoteSource = "static" | "stooq";
 
 export interface InvestmentQuote {
   priceLabel: string;
@@ -109,10 +111,7 @@ export interface InvestmentAsset {
 
 export interface UserSettings {
   defaultSearchEngine: SearchEngineId;
-  density: "comfortable" | "compact";
-  openLinksInNewTab: boolean;
   enableHistoryCapture: boolean;
-  marketApiProvider: "static" | "future-api";
   weatherLocation: string;
 }
 

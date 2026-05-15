@@ -35,11 +35,11 @@ export function ClockGreeting() {
   }, [timestamp]);
 
   return (
-    <section className="text-center">
-      <h1 className="text-3xl font-bold tracking-normal text-foreground sm:text-4xl">
+    <section className="pt-2 text-center sm:pt-0">
+      <h1 className="whitespace-nowrap text-[24px] font-bold leading-tight tracking-normal text-foreground min-[410px]:text-[25px] sm:text-4xl">
         {greeting}，专注让今天变得更有意义
       </h1>
-      <p className="mt-5 text-base text-muted-foreground">
+      <p className="mt-3 text-sm leading-6 text-muted-foreground sm:mt-5 sm:text-base">
         保持好奇，保持学习，保持成长。
       </p>
     </section>
