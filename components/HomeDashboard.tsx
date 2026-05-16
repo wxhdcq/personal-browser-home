@@ -9,7 +9,7 @@ export function HomeDashboard() {
   const { isModuleEnabled } = useModulePreferences();
 
   return (
-    <section className="grid gap-5 lg:grid-cols-3">
+    <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {isModuleEnabled("todos") ? <TodoPanel /> : null}
       {isModuleEnabled("quick-note") ? <QuickNotePanel /> : null}
       {isModuleEnabled("weather") ? <WeatherCard /> : null}

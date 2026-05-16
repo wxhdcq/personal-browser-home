@@ -38,7 +38,7 @@ export function HomeSidebar({ shortcuts }: HomeSidebarProps) {
   const { isModuleEnabled } = useModulePreferences();
 
   return (
-    <aside className="grid gap-5 xl:sticky xl:top-24">
+    <aside className="grid gap-5 md:grid-cols-2 min-[1320px]:sticky min-[1320px]:top-24 min-[1320px]:!grid-cols-1">
       <DailyQuoteCard />
       {isModuleEnabled("investments") ? (
         <InvestmentWatchlist assets={investmentAssets} />
