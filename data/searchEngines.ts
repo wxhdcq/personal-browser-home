@@ -12,7 +12,7 @@ export const searchEngines: SearchEngine[] = [
     id: "bing",
     name: "Bing",
     iconUrl: "https://www.google.com/s2/favicons?domain=bing.com&sz=64",
-    placeholder: "用 Bing 搜索",
+    placeholder: "使用 Bing 搜索",
     urlTemplate: "https://www.bing.com/search?q={query}",
   },
   {
@@ -33,7 +33,7 @@ export const searchEngines: SearchEngine[] = [
     id: "perplexity",
     name: "Perplexity",
     iconUrl: "https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64",
-    placeholder: "用 Perplexity 提问",
+    placeholder: "使用 Perplexity 提问",
     urlTemplate: "https://www.perplexity.ai/search?q={query}",
   },
 ];

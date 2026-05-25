@@ -2,8 +2,8 @@
 
 import { ChevronRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
+import { appHref } from "@/core/routing/appHref";
 import { useHistoryRecorder } from "@/hooks/useHistoryRecorder";
 import type { ShortcutLink } from "@/types/home";
 
@@ -70,12 +70,12 @@ export function ShortcutGrid({
           快捷入口
         </h2>
         {showManage ? (
-          <Link
-            href="/bookmarks"
+          <a
+            href={appHref("/bookmarks")}
             className="text-sm font-medium text-primary hover:text-primary-strong"
           >
             管理
-          </Link>
+          </a>
         ) : null}
       </div>
       <div

@@ -71,6 +71,12 @@ body {
   color: var(--foreground);
 }
 
+@media (min-width: 640px) {
+  html[data-app-target="extension"] {
+    font-size: 17px;
+  }
+}
+
 body {
   background:
     radial-gradient(circle at 25% 8%, rgba(47, 125, 246, 0.11), transparent 28rem),

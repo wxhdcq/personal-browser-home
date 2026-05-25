@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { fetchStooqQuotesForAssets } from "@/core/market/stooq";
 import type { InvestmentAsset, InvestmentQuote } from "@/types/home";
 
 interface MarketApiResponse {
@@ -9,8 +10,14 @@ interface MarketApiResponse {
 }
 
 type MarketStatus = "loading" | "success" | "error";
+type MarketProvider = "web-api" | "extension-client";
 
-async function fetchMarketQuotes(forceRefresh = false) {
+const marketProvider: MarketProvider =
+  process.env.NEXT_PUBLIC_APP_TARGET === "extension"
+    ? "extension-client"
+    : "web-api";
+
+async function fetchWebMarketQuotes(forceRefresh = false) {
   const response = await fetch(
     `/api/market${forceRefresh ? `?refresh=${Date.now()}` : ""}`,
   );
@@ -23,6 +30,28 @@ async function fetchMarketQuotes(forceRefresh = false) {
   return data.quotes ?? {};
 }
 
+async function fetchExtensionMarketQuotes(assets: InvestmentAsset[]) {
+  if (
+    typeof window === "undefined" ||
+    !["chrome-extension:", "extension:"].includes(window.location.protocol)
+  ) {
+    return {};
+  }
+
+  return fetchStooqQuotesForAssets(assets, { cache: "no-store" });
+}
+
+async function fetchMarketQuotes(
+  assets: InvestmentAsset[],
+  forceRefresh = false,
+) {
+  if (marketProvider === "extension-client") {
+    return fetchExtensionMarketQuotes(assets);
+  }
+
+  return fetchWebMarketQuotes(forceRefresh);
+}
+
 export function useMarketQuotes(assets: InvestmentAsset[]) {
   const [quotes, setQuotes] = useState<Record<string, InvestmentQuote>>({});
   const [status, setStatus] = useState<MarketStatus>("loading");
@@ -33,7 +62,7 @@ export function useMarketQuotes(assets: InvestmentAsset[]) {
 
     async function loadQuotes() {
       try {
-        const nextQuotes = await fetchMarketQuotes();
+        const nextQuotes = await fetchMarketQuotes(assets);
         if (cancelled) return;
         setQuotes(nextQuotes);
         setStatus("success");
@@ -52,14 +81,14 @@ export function useMarketQuotes(assets: InvestmentAsset[]) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [assets]);
 
   async function refresh() {
     setStatus("loading");
     setError("");
 
     try {
-      const nextQuotes = await fetchMarketQuotes(true);
+      const nextQuotes = await fetchMarketQuotes(assets, true);
       setQuotes(nextQuotes);
       setStatus("success");
     } catch (refreshError) {
@@ -82,6 +111,7 @@ export function useMarketQuotes(assets: InvestmentAsset[]) {
   return {
     assets: assetsWithQuotes,
     error,
+    provider: marketProvider,
     refresh,
     status,
   };

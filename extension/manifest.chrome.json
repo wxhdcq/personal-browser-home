@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Personal Browser Home",
+  "description": "A personal browser new tab dashboard built with Next.js.",
+  "version": "0.1.0",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": ["storage", "bookmarks", "history", "downloads"],
+  "host_permissions": [
+    "https://stooq.com/*",
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*",
+    "https://air-quality-api.open-meteo.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://stooq.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com; img-src 'self' https: data:;"
+  }
+}

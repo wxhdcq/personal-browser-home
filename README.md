@@ -1,28 +1,16 @@
 # 个人浏览器首页
 
-一个使用 Next.js、TypeScript 和 Tailwind CSS 构建的个人浏览器首页。第一版只使用本地配置文件和 `localStorage`，适合部署成网页，也方便后续改造成 Chrome 新标签页扩展。
+一个使用 Next.js、TypeScript 和 Tailwind CSS 构建的个人浏览器新标签页产品雏形。当前版本同时保留 Web 部署能力，并支持生成 Chrome / Edge 可加载的新标签页扩展目录。
 
-## 功能
+## 当前功能
 
-- 当前时间、日期和问候语
-- 大搜索框，默认 Google，并预留 Bing、YouTube、GitHub、Perplexity
-- 分类快捷入口：AI 工具、投资、学习、开发、娱乐、服务器
-- 今日待办：新增、完成、删除，数据保存在 `localStorage`
-- 投资关注列表：NVDA、MSFT、META、MU、QQQM、黄金
-- 真实天气：使用 Open-Meteo 免费接口获取当前天气和空气质量
-- 深色/浅色模式切换
-- 响应式卡片布局，兼顾 16:9 屏幕和移动端
-- 左侧页面入口：书签、历史记录、下载、插件、笔记、设置
-
-## 页面结构
-
-- `/`：浏览器首页
-- `/bookmarks`：本地书签管理，后续可接 `chrome.bookmarks`
-- `/history`：首页操作历史，后续可接 `chrome.history`
-- `/downloads`：常用下载入口，后续可接 `chrome.downloads`
-- `/plugins`：首页模块开关
-- `/notes`：本地笔记
-- `/settings`：默认搜索引擎、历史记录开关、本地数据导入导出
+- 当前时间、日期、问候语
+- 搜索框，默认 Google，支持 Bing、YouTube、GitHub、Perplexity
+- 可管理的快捷入口，支持分类、名称、网址、描述
+- 今日待办，数据通过 `StorageAdapter` 保存
+- 快捷笔记、天气、市场概览、历史、下载、插件、设置等模块
+- 深色 / 浅色模式
+- 移动端、笔记本和大屏响应式布局
 
 ## 运行
 
@@ -31,132 +19,163 @@ npm install
 npm run dev
 ```
 
-默认开发地址是：
+默认开发地址：
 
 ```text
 http://localhost:3000
 ```
 
-构建生产版本：
+Web 版生产构建：
 
 ```bash
 npm run build
 ```
 
-启动生产服务：
+启动 Web 版生产服务：
 
 ```bash
 npm run start
 ```
 
-## 修改快捷网站
+## 扩展构建
 
-快捷入口都放在 `data/shortcuts.ts`。
+生成 Chrome / Edge 可加载目录：
 
-每个入口结构如下：
+```bash
+npm run build:extension
+```
+
+构建产物位于：
+
+```text
+out-extension
+```
+
+在 Chrome / Edge 中加载：
+
+1. 打开扩展管理页。
+2. 开启开发者模式。
+3. 选择“加载已解压的扩展程序”。
+4. 选择项目里的 `out-extension` 目录。
+
+扩展入口配置位于 `extension/manifest.chrome.json`，其中 `chrome_url_overrides.newtab` 指向 `index.html`。
+
+## 架构约束
+
+- 业务组件不直接访问 `localStorage`，统一通过 `StorageAdapter`。
+- 浏览器扩展 API 不在组件内直接调用，统一通过 adapter 封装。
+- Web 版保留 Next.js API Route。
+- Extension 版使用静态导出，不依赖 Next.js API Route。
+- 市场概览在 Web 版走 `/api/market`，在扩展版走 client/provider 模式。
+
+## 数据与存储
+
+相关文件：
+
+- `core/storage/StorageAdapter.ts`：存储接口
+- `core/storage/LocalStorageAdapter.ts`：Web 本地存储实现
+- `core/storage/ChromeStorageAdapter.ts`：扩展版 `chrome.storage` 实现
+- `hooks/useLocalStorage.ts`：兼容现有组件 API，但底层已迁移到 adapter
+- `core/storage/schema.ts`：应用数据备份结构、`schemaVersion` 和迁移函数
+
+完整数据备份格式：
+
+```json
+{
+  "app": "personal-browser-home",
+  "schemaVersion": 1,
+  "exportedAt": "2026-05-16T00:00:00.000Z",
+  "records": {}
+}
+```
+
+## 修改快捷入口
+
+默认快捷入口在 `data/shortcuts.ts`。也可以在 `/settings` 的“快捷入口编辑”中直接新增、修改、删除，并恢复默认配置。
+
+每个入口结构：
 
 ```ts
 {
   id: "github",
   name: "GitHub",
   url: "https://github.com",
-  description: "代码仓库、Issue、PR 和开源项目。",
+  description: "代码托管平台",
   category: "开发",
 }
 ```
 
-分类类型定义在 `types/home.ts` 的 `shortcutCategories`。如果要新增分类，先修改那里，再给入口使用新的分类名。
+分类类型定义在 `types/home.ts` 的 `shortcutCategories`。
 
 ## 修改搜索引擎
 
-搜索引擎配置在 `data/searchEngines.ts`。
+默认搜索引擎在 `data/searchEngines.ts`。也可以在 `/settings` 的“搜索引擎编辑”中修改名称、占位文案、图标 URL 和搜索 URL 模板。
 
-`urlTemplate` 中的 `{query}` 会被替换为编码后的搜索内容：
+`urlTemplate` 必须包含 `{query}`：
 
 ```ts
 {
   id: "google",
   name: "Google",
-  placeholder: "用 Google 搜索，或输入网址",
+  placeholder: "搜索或输入网址",
   urlTemplate: "https://www.google.com/search?q={query}",
 }
 ```
 
-## 修改投资关注列表
+## 天气与市场数据
 
-投资关注列表配置在 `data/investments.ts`。每个资产可以配置 `stooqSymbol`，例如：
+天气使用 Open-Meteo 免费接口，当前在 `hooks/useWeather.ts` 中实现，并通过 adapter 做 15 分钟缓存。
 
-```ts
-{
-  symbol: "NVDA",
-  stooqSymbol: "nvda.us",
-  name: "NVIDIA",
-}
-```
+市场概览：
 
-市场概览会通过 `app/api/market/route.ts` 请求 Stooq 免费报价接口，返回当前价和相对上一收盘价的涨跌幅。接口失败时会自动回退到本地 `quote` 静态数据。
+- Web 版：`hooks/useMarketQuotes.ts` 请求 `app/api/market/route.ts`。
+- Extension 版：`hooks/useMarketQuotes.ts` 使用客户端 Stooq provider。
+- 共享解析逻辑：`core/market/stooq.ts`。
+- 接口失败时回退到 `data/investments.ts` 中的静态数据。
 
-如果以后要换成 Finnhub、Alpha Vantage、Polygon 等需要密钥的数据源，可以保留 `InvestmentAsset` 和 `InvestmentQuote` 结构，只替换 `app/api/market/route.ts` 里的适配逻辑。
+## 浏览器 API Adapter
 
-## 天气数据
+扩展浏览器能力统一封装在：
 
-天气卡片使用 Open-Meteo：
+- `core/browser/BrowserApiAdapter.ts`
 
-- Geocoding API：把设置页中的位置转换成经纬度
-- Forecast API：获取当前温度、体感温度、湿度、天气代码、风速
-- Air Quality API：获取 PM2.5 和 US AQI
-
-当前实现位于 `hooks/useWeather.ts`，默认做 15 分钟 localStorage 缓存。位置可在 `/settings` 的“天气位置”里修改。
+当前已经定义书签、历史、下载的 adapter 边界。第三阶段再把 UI 模块接到 `chrome.bookmarks`、`chrome.history`、`chrome.downloads`。
 
 ## 部署
 
-推荐部署到 Vercel：
+推荐 Web 版部署到 Vercel：
 
 1. 将项目推送到 GitHub。
 2. 在 Vercel 导入仓库。
 3. Framework 选择 Next.js。
 4. Build Command 使用 `npm run build`。
 
-这个项目没有后端和数据库，默认部署不需要额外环境变量。
+当前 Web 版不需要数据库和额外环境变量。
 
-## 后续改造成 Chrome 新标签页扩展
+## 后续阶段
 
-这个项目已经把数据和 UI 分开，后续改成扩展时主要做三件事：
+第三阶段计划：
 
-1. 改为静态导出。
+- 接入 `chrome.bookmarks`
+- 接入 `chrome.history`
+- 接入 `chrome.downloads`
+- 增加权限说明
+- 增加扩展隐私说明
+- 增加 Playwright 或基础 E2E 测试
 
-   在 `next.config.ts` 中加入：
+## 第三阶段进展
 
-   ```ts
-   const nextConfig: NextConfig = {
-     output: "export",
-     images: {
-       unoptimized: true,
-     },
-   };
-   ```
+已完成浏览器真实能力接入：
 
-2. 新增扩展清单。
+- `chrome.bookmarks`：书签页展示真实浏览器书签，并可加入首页快捷入口。
+- `chrome.history`：历史页展示最近浏览器访问记录。
+- `chrome.downloads`：下载页展示最近浏览器下载记录。
+- 所有浏览器能力仍通过 `core/browser/BrowserApiAdapter.ts` 封装，组件不直接调用 `chrome.*`。
 
-   在 `public/manifest.json` 中加入类似配置：
+权限说明见 `extension/PERMISSIONS.md`，隐私说明见 `extension/PRIVACY.md`。
 
-   ```json
-   {
-     "manifest_version": 3,
-     "name": "个人浏览器首页",
-     "version": "0.1.0",
-     "chrome_url_overrides": {
-       "newtab": "index.html"
-     }
-   }
-   ```
+扩展构建校验：
 
-3. 构建并加载扩展。
-
-   ```bash
-   npm run build
-   ```
-
-   使用 Chrome 的“加载已解压的扩展程序”，选择生成的 `out` 目录。
-
-注意：扩展环境下依然可以使用 `localStorage`。如果以后要同步待办或配置，可以再升级到 `chrome.storage.sync`。
+```bash
+npm run test:e2e
+```

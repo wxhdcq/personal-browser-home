@@ -7,6 +7,7 @@ import { HomeSidebar } from "@/components/HomeSidebar";
 import { MobileHome } from "@/components/MobileHome";
 import { SearchBox } from "@/components/SearchBox";
 import { UtilityLinksCard } from "@/components/UtilityLinksCard";
+import { useManagedSearchEngines } from "@/hooks/useManagedSearchEngines";
 import { useManagedShortcuts } from "@/hooks/useManagedShortcuts";
 import type { SearchEngine, ShortcutLink } from "@/types/home";
 
@@ -27,8 +28,11 @@ function getMobileSnapshot() {
 
 export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
   const [managedShortcuts] = useManagedShortcuts();
+  const [managedSearchEngines] = useManagedSearchEngines();
   const visibleShortcuts =
     managedShortcuts.length > 0 ? managedShortcuts : shortcuts;
+  const visibleSearchEngines =
+    managedSearchEngines.length > 0 ? managedSearchEngines : engines;
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
     getMobileSnapshot,
@@ -36,7 +40,9 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
   );
 
   if (isMobile) {
-    return <MobileHome engines={engines} shortcuts={visibleShortcuts} />;
+    return (
+      <MobileHome engines={visibleSearchEngines} shortcuts={visibleShortcuts} />
+    );
   }
 
   return (
@@ -47,7 +53,7 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
             <ClockGreeting />
             <div className="mt-7">
               <SearchBox
-                engines={engines}
+                engines={visibleSearchEngines}
                 className="max-w-[900px]"
               />
             </div>

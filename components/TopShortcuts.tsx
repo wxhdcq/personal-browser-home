@@ -1,9 +1,9 @@
 "use client";
 
 import { ChevronRight, Pencil } from "lucide-react";
-import Link from "next/link";
 import { PlatformIcon } from "@/components/ShortcutGrid";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import { appHref } from "@/core/routing/appHref";
 import { useHistoryRecorder } from "@/hooks/useHistoryRecorder";
 import type { ShortcutLink } from "@/types/home";
 
@@ -48,13 +48,13 @@ export function TopShortcuts({ shortcuts, variant = "hero" }: TopShortcutsProps)
       {isSidebar ? (
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-foreground">快捷入口</h2>
-          <Link
-            href="/bookmarks"
+          <a
+            href={appHref("/bookmarks")}
             className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-strong"
           >
             <Pencil aria-hidden size={14} />
             编辑
-          </Link>
+          </a>
         </div>
       ) : null}
       <div

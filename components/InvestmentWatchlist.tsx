@@ -28,7 +28,9 @@ export function InvestmentWatchlist({ assets }: InvestmentWatchlistProps) {
       ? "更新中"
       : market.status === "error"
         ? "本地兜底"
-        : "Stooq 延迟";
+        : market.provider === "extension-client"
+          ? "扩展客户端"
+          : "Stooq 延迟";
 
   return (
     <SurfaceCard>

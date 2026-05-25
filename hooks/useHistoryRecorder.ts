@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
 import { defaultSettings } from "@/data/settings";
 import { storageKeys } from "@/data/storageKeys";
 import type { HistoryEntry } from "@/types/home";
@@ -14,7 +15,7 @@ function createId() {
 function readHistory() {
   try {
     return JSON.parse(
-      window.localStorage.getItem(storageKeys.history) ?? "[]",
+      localStorageAdapter.getItemSync(storageKeys.history) ?? "[]",
     ) as HistoryEntry[];
   } catch {
     return [];
@@ -25,7 +26,7 @@ export function useHistoryRecorder() {
   return useCallback((entry: Omit<HistoryEntry, "id" | "createdAt">) => {
     try {
       const settings = JSON.parse(
-        window.localStorage.getItem(storageKeys.settings) ??
+        localStorageAdapter.getItemSync(storageKeys.settings) ??
           JSON.stringify(defaultSettings),
       ) as typeof defaultSettings;
 
@@ -39,14 +40,9 @@ export function useHistoryRecorder() {
         createdAt: new Date().toISOString(),
       };
       const history = readHistory();
-      window.localStorage.setItem(
+      void localStorageAdapter.setItem(
         storageKeys.history,
         JSON.stringify([nextEntry, ...history].slice(0, 200)),
-      );
-      window.dispatchEvent(
-        new CustomEvent("personal-home.local-storage-change", {
-          detail: { key: storageKeys.history },
-        }),
       );
     } catch {
       // History capture should never block navigation.

@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:extension": "node scripts/build-extension.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "npm run build:extension && node scripts/verify-extension-build.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.14.0",

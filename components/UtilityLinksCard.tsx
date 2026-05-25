@@ -8,8 +8,8 @@ import {
   Puzzle,
   Settings,
 } from "lucide-react";
-import Link from "next/link";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import { appHref } from "@/core/routing/appHref";
 
 const utilityLinks = [
   { label: "历史记录", href: "/history", icon: Clock3 },
@@ -32,14 +32,14 @@ export function UtilityLinksCard() {
           const Icon = item.icon;
 
           return (
-            <Link
+            <a
               key={item.href}
-              href={item.href}
+              href={appHref(item.href)}
               className="flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium text-muted-foreground transition hover:border-primary/30 hover:text-primary"
             >
               <Icon aria-hidden size={17} />
               <span className="truncate">{item.label}</span>
-            </Link>
+            </a>
           );
         })}
       </div>

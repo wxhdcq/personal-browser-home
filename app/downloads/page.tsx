@@ -1,4 +1,5 @@
 import { AppFrame } from "@/components/AppFrame";
+import { BrowserDownloadsPanel } from "@/components/BrowserDownloadsPanel";
 import { DownloadsPanel } from "@/components/DownloadsPanel";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -7,9 +8,12 @@ export default function DownloadsPage() {
     <AppFrame>
       <PageHeader
         title="下载"
-        description="第一版作为常用下载入口和资料入口。后续扩展版可接入 chrome.downloads 展示真实下载历史。"
+        description="查看扩展读取到的浏览器下载记录，也保留常用下载入口和资料入口。"
       />
-      <DownloadsPanel />
+      <div className="grid gap-4">
+        <BrowserDownloadsPanel />
+        <DownloadsPanel />
+      </div>
     </AppFrame>
   );
 }

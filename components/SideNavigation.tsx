@@ -10,8 +10,8 @@ import {
   Puzzle,
   Settings,
 } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { appHref } from "@/core/routing/appHref";
 
 const navItems = [
   { label: "首页", href: "/", icon: Home },
@@ -48,9 +48,9 @@ export function SideNavigation() {
           const isActive = isActivePath(pathname, item.href);
 
           return (
-            <Link
+            <a
               key={item.href}
-              href={item.href}
+              href={appHref(item.href)}
               className={[
                 "flex h-12 min-w-12 flex-col items-center justify-center gap-1 rounded-xl px-2 text-xs font-medium transition",
                 isActive
@@ -65,7 +65,7 @@ export function SideNavigation() {
                 className={isActive ? "fill-primary/15" : undefined}
               />
               <span>{item.label}</span>
-            </Link>
+            </a>
           );
         })}
       </nav>
@@ -77,9 +77,9 @@ export function SideNavigation() {
             const isActive = isActivePath(pathname, item.href);
 
             return (
-              <Link
+              <a
                 key={item.href}
-                href={item.href}
+                href={appHref(item.href)}
                 className={[
                   "flex h-11 items-center justify-start gap-2 rounded-lg px-3 text-sm font-medium transition",
                   isActive
@@ -90,7 +90,7 @@ export function SideNavigation() {
               >
                 <Icon aria-hidden size={18} />
                 <span>{item.label}</span>
-              </Link>
+              </a>
             );
           })}
         </nav>

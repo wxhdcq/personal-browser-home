@@ -4,13 +4,13 @@ export const defaultModules: ModulePreference[] = [
   {
     id: "todos",
     name: "今日待办",
-    description: "首页任务清单，数据保存到 localStorage。",
+    description: "首页任务清单，数据保存到本地存储。",
     enabled: true,
   },
   {
     id: "investments",
     name: "投资关注",
-    description: "行情观察列表，后续可继续接入更完整的真实行情 API。",
+    description: "行情观察列表，后续可接入更多真实行情数据源。",
     enabled: true,
   },
   {
@@ -22,7 +22,7 @@ export const defaultModules: ModulePreference[] = [
   {
     id: "weather",
     name: "天气卡片",
-    description: "通过 Open-Meteo 免费接口获取实时天气，位置可在设置页修改。",
+    description: "通过 Open-Meteo 免费接口获取实时天气。",
     enabled: true,
   },
   {

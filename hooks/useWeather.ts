@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
 import { storageKeys } from "@/data/storageKeys";
 import type { WeatherSnapshot } from "@/types/home";
 
@@ -55,7 +56,7 @@ function readCachedWeather(location: string) {
 
   try {
     const cached = JSON.parse(
-      window.localStorage.getItem(cacheKey(location)) ?? "null",
+      localStorageAdapter.getItemSync(cacheKey(location)) ?? "null",
     ) as WeatherSnapshot | null;
 
     if (!cached) return undefined;
@@ -71,7 +72,7 @@ function readCachedWeather(location: string) {
 
 function writeCachedWeather(location: string, data: WeatherSnapshot) {
   try {
-    window.localStorage.setItem(cacheKey(location), JSON.stringify(data));
+    void localStorageAdapter.setItem(cacheKey(location), JSON.stringify(data));
   } catch {
     // Weather should still render if cache persistence is blocked.
   }
@@ -265,7 +266,7 @@ export function useWeather(location: string) {
     ...state,
     refresh: () => {
       try {
-        window.localStorage.removeItem(cacheKey(normalizedLocation));
+        void localStorageAdapter.removeItem(cacheKey(normalizedLocation));
       } catch {
         // Ignore cache cleanup failure.
       }

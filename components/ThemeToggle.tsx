@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
+import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
 
 const themeStorageKey = "personal-home.theme";
 const themeChangeEvent = "personal-home.theme-change";
@@ -19,7 +20,7 @@ function readThemeSnapshot(): ThemeMode {
   }
 
   try {
-    return window.localStorage.getItem(themeStorageKey) === "dark"
+    return localStorageAdapter.getItemSync(themeStorageKey) === "dark"
       ? "dark"
       : "light";
   } catch {
@@ -28,16 +29,12 @@ function readThemeSnapshot(): ThemeMode {
 }
 
 function subscribeToTheme(callback: () => void) {
-  function handleStorageChange(event: StorageEvent) {
-    if (event.key === themeStorageKey) callback();
-  }
-
   window.addEventListener(themeChangeEvent, callback);
-  window.addEventListener("storage", handleStorageChange);
+  const unsubscribe = localStorageAdapter.subscribe(themeStorageKey, callback);
 
   return () => {
     window.removeEventListener(themeChangeEvent, callback);
-    window.removeEventListener("storage", handleStorageChange);
+    unsubscribe();
   };
 }
 
@@ -57,7 +54,7 @@ export function ThemeToggle() {
     applyTheme(nextTheme);
 
     try {
-      window.localStorage.setItem(themeStorageKey, nextTheme);
+      void localStorageAdapter.setItem(themeStorageKey, nextTheme);
     } catch {
       // Theme still applies for this page even if persistence is blocked.
     }
