@@ -2,16 +2,11 @@
 
 import { Edit3, Pin, Plus, Search, Trash2 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { createId } from "@/core/utils/id";
 import { storageKeys } from "@/data/storageKeys";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { SurfaceCard } from "@/components/SurfaceCard";
 import type { NoteItem } from "@/types/home";
-
-function createId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random()}`;
-}
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("zh-CN", {

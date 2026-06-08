@@ -5,8 +5,7 @@ import {
   browserApiAdapter,
   type BrowserDownloadItem,
 } from "@/core/browser/BrowserApiAdapter";
-
-type BrowserDataStatus = "loading" | "ready" | "unavailable" | "error";
+import type { BrowserDataStatus } from "@/core/browser/types";
 
 export function useBrowserDownloads(maxResults = 30) {
   const [status, setStatus] = useState<BrowserDataStatus>("loading");

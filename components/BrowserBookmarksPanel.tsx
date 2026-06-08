@@ -4,16 +4,11 @@ import { Bookmark, ExternalLink, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { BrowserDataNotice } from "@/components/BrowserDataNotice";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import { createId } from "@/core/utils/id";
 import { shortcutCategories } from "@/types/home";
 import { useBrowserBookmarks } from "@/hooks/useBrowserBookmarks";
 import { useHistoryRecorder } from "@/hooks/useHistoryRecorder";
 import { useManagedShortcuts } from "@/hooks/useManagedShortcuts";
-
-function createId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random()}`;
-}
 
 export function BrowserBookmarksPanel() {
   const { status, items, error, refresh } = useBrowserBookmarks();

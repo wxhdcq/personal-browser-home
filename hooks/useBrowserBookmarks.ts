@@ -5,6 +5,7 @@ import {
   browserApiAdapter,
   type BrowserBookmarkNode,
 } from "@/core/browser/BrowserApiAdapter";
+import type { BrowserDataStatus } from "@/core/browser/types";
 
 export interface BrowserBookmarkLink {
   id: string;
@@ -12,8 +13,6 @@ export interface BrowserBookmarkLink {
   url: string;
   path: string;
 }
-
-type BrowserDataStatus = "loading" | "ready" | "unavailable" | "error";
 
 function flattenBookmarks(
   nodes: BrowserBookmarkNode[],

@@ -5,8 +5,7 @@ import {
   browserApiAdapter,
   type BrowserHistoryItem,
 } from "@/core/browser/BrowserApiAdapter";
-
-type BrowserDataStatus = "loading" | "ready" | "unavailable" | "error";
+import type { BrowserDataStatus } from "@/core/browser/types";
 
 export function useBrowserHistory(maxResults = 50) {
   const [status, setStatus] = useState<BrowserDataStatus>("loading");

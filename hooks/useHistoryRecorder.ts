@@ -2,15 +2,10 @@
 
 import { useCallback } from "react";
 import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
+import { createId } from "@/core/utils/id";
 import { defaultSettings } from "@/data/settings";
 import { storageKeys } from "@/data/storageKeys";
 import type { HistoryEntry } from "@/types/home";
-
-function createId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random()}`;
-}
 
 function readHistory() {
   try {

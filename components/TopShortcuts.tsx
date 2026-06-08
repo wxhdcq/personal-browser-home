@@ -19,7 +19,6 @@ const preferredShortcutIds = [
   "bilibili",
   "weibo",
   "feishu",
-  "bilibili-popular",
 ];
 
 interface TopShortcutsProps {

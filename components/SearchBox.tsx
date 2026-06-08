@@ -4,7 +4,6 @@ import { ArrowRight, Search } from "lucide-react";
 import Image from "next/image";
 import {
   FormEvent,
-  KeyboardEvent,
   useEffect,
   useMemo,
   useRef,
@@ -105,10 +104,6 @@ export function SearchBox({
     runSearch();
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter") runSearch();
-  }
-
   return (
     <section
       className={["mx-auto w-full max-w-[760px]", className]
@@ -128,7 +123,6 @@ export function SearchBox({
           ref={inputRef}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={handleKeyDown}
           className="h-full min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
           placeholder={selectedEngine?.placeholder ?? "搜索或输入网址"}
           autoComplete="off"

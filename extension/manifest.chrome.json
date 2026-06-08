@@ -6,14 +6,15 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": ["storage", "bookmarks", "history", "downloads"],
+  "permissions": ["storage", "bookmarks", "history", "downloads", "notifications"],
   "host_permissions": [
     "https://stooq.com/*",
     "https://api.open-meteo.com/*",
     "https://geocoding-api.open-meteo.com/*",
-    "https://air-quality-api.open-meteo.com/*"
+    "https://air-quality-api.open-meteo.com/*",
+    "https://v1.hitokoto.cn/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://stooq.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com; img-src 'self' https: data:;"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://stooq.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com https://v1.hitokoto.cn; img-src 'self' https: data:;"
   }
 }

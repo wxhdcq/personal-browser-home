@@ -1,9 +1,10 @@
 "use client";
 
 import { RefreshCcw } from "lucide-react";
+import type { BrowserDataStatus } from "@/core/browser/types";
 
 interface BrowserDataNoticeProps {
-  status: "loading" | "ready" | "unavailable" | "error";
+  status: BrowserDataStatus;
   unavailableText: string;
   emptyText: string;
   error?: string | null;

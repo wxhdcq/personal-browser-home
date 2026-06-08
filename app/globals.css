@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant cyberpunk (&:where(.cyberpunk, .cyberpunk *));
 
 @theme inline {
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -24,6 +25,9 @@
   --color-accent: var(--primary);
   --color-accent-strong: var(--primary-strong);
   --color-accent-foreground: var(--primary-foreground);
+  --color-neon-cyan: var(--neon-cyan, #00f0ff);
+  --color-neon-magenta: var(--neon-magenta, #ff00e5);
+  --color-neon-purple: var(--neon-purple, #b400ff);
 }
 
 :root {
@@ -60,6 +64,29 @@
   --danger: #ff5d6c;
 }
 
+.cyberpunk {
+  --background: #05060e;
+  --foreground: #e0f0ff;
+  --shell: #08091a;
+  --card: #0a0c1e;
+  --elevated: #0e1128;
+  --border: #1a1e3a;
+  --soft: #5a6080;
+  --muted-foreground: #8890b0;
+  --primary: #00f0ff;
+  --primary-strong: #00c8d8;
+  --primary-foreground: #020208;
+  --success: #00ff9f;
+  --warning: #ffe600;
+  --danger: #ff2d6f;
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff00e5;
+  --neon-purple: #b400ff;
+  --neon-glow-sm: 0 0 6px rgba(0, 240, 255, 0.35), 0 0 20px rgba(0, 240, 255, 0.10);
+  --neon-glow-md: 0 0 10px rgba(0, 240, 255, 0.40), 0 0 40px rgba(0, 240, 255, 0.12);
+  --neon-glow-lg: 0 0 16px rgba(0, 240, 255, 0.50), 0 0 60px rgba(0, 240, 255, 0.15), 0 0 100px rgba(0, 240, 255, 0.06);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -82,6 +109,25 @@ body {
     radial-gradient(circle at 25% 8%, rgba(47, 125, 246, 0.11), transparent 28rem),
     radial-gradient(circle at 82% 22%, rgba(148, 163, 184, 0.18), transparent 24rem),
     var(--background);
+}
+
+.cyberpunk body {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(0, 240, 255, 0.07), transparent 30rem),
+    radial-gradient(circle at 78% 8%, rgba(255, 0, 229, 0.05), transparent 26rem),
+    radial-gradient(circle at 50% 90%, rgba(180, 0, 255, 0.04), transparent 32rem),
+    var(--background);
+}
+
+.cyberpunk ::selection {
+  background: color-mix(in srgb, var(--neon-cyan) 28%, transparent);
+}
+
+.cyberpunk ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--neon-cyan) 30%, transparent);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
 }
 
 button,
@@ -109,4 +155,109 @@ textarea {
   border: 3px solid transparent;
   border-radius: 999px;
   background-clip: content-box;
+}
+
+/* ───── Cyberpunk: neon card borders ───── */
+.cyberpunk section[class*="border-border"][class*="bg-card"] {
+  border-color: rgba(0, 240, 255, 0.12);
+  box-shadow:
+    0 0 1px rgba(0, 240, 255, 0.30),
+    inset 0 1px 0 rgba(0, 240, 255, 0.06);
+}
+
+.cyberpunk section[class*="border-border"][class*="bg-card"]:hover {
+  border-color: rgba(0, 240, 255, 0.22);
+  box-shadow:
+    0 0 8px rgba(0, 240, 255, 0.18),
+    0 0 30px rgba(0, 240, 255, 0.05),
+    inset 0 1px 0 rgba(0, 240, 255, 0.08);
+}
+
+/* ───── Cyberpunk: search box glow ───── */
+.cyberpunk form[class*="rounded-full"][class*="border-border"] {
+  border-color: rgba(0, 240, 255, 0.18);
+  box-shadow:
+    0 0 12px rgba(0, 240, 255, 0.10),
+    inset 0 1px 0 rgba(0, 240, 255, 0.05);
+}
+
+.cyberpunk form[class*="rounded-full"][class*="border-border"]:focus-within {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow:
+    0 0 16px rgba(0, 240, 255, 0.25),
+    0 0 50px rgba(0, 240, 255, 0.08);
+}
+
+/* ───── Cyberpunk: top bar neon underline ───── */
+.cyberpunk header[class*="sticky"][class*="border-b"] {
+  border-image: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(0, 240, 255, 0.35) 30%,
+    rgba(255, 0, 229, 0.25) 70%,
+    transparent 95%
+  ) 1;
+  background: rgba(5, 6, 14, 0.92);
+  backdrop-filter: blur(20px);
+}
+
+/* ───── Cyberpunk: active nav neon accent ───── */
+.cyberpunk a[aria-current="page"] {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+/* ───── Cyberpunk: button glow on primary buttons ───── */
+.cyberpunk button[class*="bg-primary"]:not(:disabled),
+.cyberpunk a[class*="bg-primary"] {
+  box-shadow:
+    0 0 8px rgba(0, 240, 255, 0.30),
+    0 0 24px rgba(0, 240, 255, 0.10);
+}
+
+.cyberpunk button[class*="bg-primary"]:not(:disabled):hover,
+.cyberpunk a[class*="bg-primary"]:hover {
+  box-shadow:
+    0 0 14px rgba(0, 240, 255, 0.45),
+    0 0 40px rgba(0, 240, 255, 0.15);
+}
+
+/* ───── Cyberpunk: input neon focus ───── */
+.cyberpunk input:focus,
+.cyberpunk textarea:focus,
+.cyberpunk select:focus {
+  border-color: rgba(0, 240, 255, 0.40) !important;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.20) !important;
+}
+
+/* ───── Cyberpunk: shortcut card hover glow ───── */
+.cyberpunk a[class*="border-border"][class*="bg-card"]:hover {
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow:
+    0 0 10px rgba(0, 240, 255, 0.15),
+    0 0 35px rgba(0, 240, 255, 0.05);
+}
+
+/* ───── Cyberpunk: scanline overlay (subtle) ───── */
+.cyberpunk::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.012) 2px,
+    rgba(0, 240, 255, 0.012) 4px
+  );
+}
+
+/* ───── Cyberpunk: greeting title gradient ───── */
+.cyberpunk h1[class*="font-bold"] {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta) 60%, var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.25));
 }

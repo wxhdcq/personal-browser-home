@@ -13,6 +13,8 @@ import {
 import { FormEvent, useMemo, useState } from "react";
 import { PlatformIcon } from "@/components/ShortcutGrid";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import { createId } from "@/core/utils/id";
+import { normalizeUrl } from "@/core/utils/url";
 import { shortcuts } from "@/data/shortcuts";
 import { useHistoryRecorder } from "@/hooks/useHistoryRecorder";
 import {
@@ -26,18 +28,6 @@ import {
 } from "@/types/home";
 
 const allCategories = ["全部", ...shortcutCategories] as const;
-
-function createId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random()}`;
-}
-
-function normalizeUrl(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-}
 
 function emptyForm() {
   return {

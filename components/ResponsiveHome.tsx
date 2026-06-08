@@ -9,12 +9,6 @@ import { SearchBox } from "@/components/SearchBox";
 import { UtilityLinksCard } from "@/components/UtilityLinksCard";
 import { useManagedSearchEngines } from "@/hooks/useManagedSearchEngines";
 import { useManagedShortcuts } from "@/hooks/useManagedShortcuts";
-import type { SearchEngine, ShortcutLink } from "@/types/home";
-
-interface ResponsiveHomeProps {
-  engines: SearchEngine[];
-  shortcuts: ShortcutLink[];
-}
 
 function subscribeToMobile(callback: () => void) {
   const query = window.matchMedia("(max-width: 639px)");
@@ -26,13 +20,9 @@ function getMobileSnapshot() {
   return window.matchMedia("(max-width: 639px)").matches;
 }
 
-export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
+export function ResponsiveHome() {
   const [managedShortcuts] = useManagedShortcuts();
   const [managedSearchEngines] = useManagedSearchEngines();
-  const visibleShortcuts =
-    managedShortcuts.length > 0 ? managedShortcuts : shortcuts;
-  const visibleSearchEngines =
-    managedSearchEngines.length > 0 ? managedSearchEngines : engines;
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
     getMobileSnapshot,
@@ -41,7 +31,7 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
 
   if (isMobile) {
     return (
-      <MobileHome engines={visibleSearchEngines} shortcuts={visibleShortcuts} />
+      <MobileHome engines={managedSearchEngines} shortcuts={managedShortcuts} />
     );
   }
 
@@ -53,7 +43,7 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
             <ClockGreeting />
             <div className="mt-7">
               <SearchBox
-                engines={visibleSearchEngines}
+                engines={managedSearchEngines}
                 className="max-w-[900px]"
               />
             </div>
@@ -67,7 +57,7 @@ export function ResponsiveHome({ engines, shortcuts }: ResponsiveHomeProps) {
           </div>
         </div>
 
-        <HomeSidebar shortcuts={visibleShortcuts} />
+        <HomeSidebar shortcuts={managedShortcuts} />
       </div>
     </div>
   );

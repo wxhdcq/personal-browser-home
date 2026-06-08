@@ -3,16 +3,14 @@
 import { Check, Plus, Square, Trash2 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import { createId } from "@/core/utils/id";
 import { storageKeys } from "@/data/storageKeys";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { TodoItem } from "@/types/home";
 
 function createTodo(title: string): TodoItem {
   return {
-    id:
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random()}`,
+    id: createId(),
     title,
     completed: false,
     createdAt: new Date().toISOString(),
@@ -24,7 +22,7 @@ function todoTime(index: number) {
 }
 
 export function TodoPanel() {
-  const [todos, setTodos, isLoaded] = useLocalStorage<TodoItem[]>(
+  const [todos, setTodos] = useLocalStorage<TodoItem[]>(
     storageKeys.todos,
     [],
   );
@@ -61,7 +59,7 @@ export function TodoPanel() {
         <div>
           <h2 className="text-lg font-semibold text-foreground">今日待办</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isLoaded ? `已完成 ${completedCount} / ${todos.length}` : "读取中"}
+            已完成 {completedCount} / {todos.length}
           </p>
         </div>
         <button

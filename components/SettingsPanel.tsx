@@ -1,12 +1,15 @@
 "use client";
 
 import { Download, RotateCcw, Save, Upload } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
 import {
   createAppDataBackup,
   migrateAppDataBackup,
 } from "@/core/storage/schema";
+import { createId } from "@/core/utils/id";
+import { normalizeUrl } from "@/core/utils/url";
 import { defaultSettings } from "@/data/settings";
 import { searchEngines } from "@/data/searchEngines";
 import { shortcuts } from "@/data/shortcuts";
@@ -29,17 +32,28 @@ import {
 } from "@/types/home";
 
 const managedKeys = Object.values(storageKeys);
+const weatherLocationDebounceMs = 600;
+const statusVisibleMs = 3000;
 
-function createId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random()}`;
+function backupFilename(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `personal-home-backup-${year}${month}${day}.json`;
 }
 
-function normalizeUrl(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+function downloadJsonBackup(filename: string, content: string) {
+  const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function shortcutFormFrom(item?: BookmarkItem) {
@@ -67,6 +81,10 @@ export function SettingsPanel() {
     storageKeys.settings,
     defaultSettings,
   );
+  const [weatherLocationEdit, setWeatherLocationEdit] = useState(() => ({
+    base: settings.weatherLocation,
+    value: settings.weatherLocation,
+  }));
   const { modules, setModules } = useModulePreferences();
   const [managedShortcuts, setManagedShortcuts] = useManagedShortcuts();
   const [managedEngines, setManagedEngines] = useManagedSearchEngines();
@@ -84,6 +102,33 @@ export function SettingsPanel() {
   );
   const [dataText, setDataText] = useState("");
   const [status, setStatus] = useState("");
+
+  const weatherLocationDraft =
+    weatherLocationEdit.base === settings.weatherLocation
+      ? weatherLocationEdit.value
+      : settings.weatherLocation;
+
+  useEffect(() => {
+    if (!status) return;
+
+    const timeoutId = window.setTimeout(() => setStatus(""), statusVisibleMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [status]);
+
+  useEffect(() => {
+    if (weatherLocationDraft === settings.weatherLocation) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setSettings((current) =>
+        current.weatherLocation === weatherLocationDraft
+          ? current
+          : { ...current, weatherLocation: weatherLocationDraft },
+      );
+    }, weatherLocationDebounceMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [settings.weatherLocation, setSettings, weatherLocationDraft]);
 
   const selectedShortcut = useMemo(
     () => managedShortcuts.find((shortcut) => shortcut.id === selectedShortcutId),
@@ -182,8 +227,27 @@ export function SettingsPanel() {
   async function exportData() {
     const records = await localStorageAdapter.getItems(managedKeys);
     const backup = createAppDataBackup(records);
-    setDataText(JSON.stringify(backup, null, 2));
+    const text = JSON.stringify(backup, null, 2);
+
+    setDataText(text);
+    downloadJsonBackup(backupFilename(), text);
     setStatus(`已生成 schemaVersion ${backup.schemaVersion} 备份`);
+  }
+
+  async function importBackupFile(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    try {
+      setDataText(await file.text());
+      setStatus("备份文件已读取，请确认后恢复");
+    } catch {
+      setStatus("读取备份文件失败");
+    } finally {
+      input.value = "";
+    }
   }
 
   async function importData(event: FormEvent<HTMLFormElement>) {
@@ -232,12 +296,12 @@ export function SettingsPanel() {
                 天气位置
               </span>
               <input
-                value={settings.weatherLocation}
+                value={weatherLocationDraft}
                 onChange={(event) =>
-                  setSettings((current) => ({
-                    ...current,
-                    weatherLocation: event.target.value,
-                  }))
+                  setWeatherLocationEdit({
+                    base: settings.weatherLocation,
+                    value: event.target.value,
+                  })
                 }
                 className="h-11 w-full rounded-lg border border-border bg-elevated/70 px-3 text-sm outline-none focus:border-primary/70 focus:ring-2 focus:ring-primary/20"
               />
@@ -532,6 +596,16 @@ export function SettingsPanel() {
             </button>
           </div>
           <form onSubmit={(event) => void importData(event)} className="mt-3 space-y-3">
+            <label className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary/60 hover:text-primary">
+              <Upload aria-hidden size={16} />
+              选择 JSON 备份文件
+              <input
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => void importBackupFile(event)}
+                className="sr-only"
+              />
+            </label>
             <textarea
               value={dataText}
               onChange={(event) => setDataText(event.target.value)}

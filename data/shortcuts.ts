@@ -78,11 +78,4 @@ export const shortcuts: ShortcutLink[] = [
     description: "协作办公",
     category: "开发",
   },
-  {
-    id: "bilibili-popular",
-    name: "哔哩哔哩",
-    url: "https://www.bilibili.com/v/popular/all",
-    description: "热门视频",
-    category: "娱乐",
-  },
 ];

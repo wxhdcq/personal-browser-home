@@ -9,4 +9,5 @@ export const storageKeys = {
   modulePreferences: "personal-home.modules.v1",
   settings: "personal-home.settings.v1",
   weatherCache: "personal-home.weather-cache.v1",
+  dailyQuote: "personal-home.daily-quote.v1",
 } as const;

@@ -78,6 +78,15 @@ function writeCachedWeather(location: string, data: WeatherSnapshot) {
   }
 }
 
+function isAbortError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as { name?: unknown }).name === "AbortError"
+  );
+}
+
 function normalizeLocationCandidates(location: string) {
   const trimmed =
     location.trim() || `${fallbackLocation.admin1} ${fallbackLocation.name}`;
@@ -102,7 +111,7 @@ function getLocationLabel(result: GeocodingResult) {
   return [result.admin1, result.name].filter(Boolean).join(" ") || result.name;
 }
 
-async function geocodeLocation(location: string) {
+async function geocodeLocation(location: string, signal?: AbortSignal) {
   const candidates = normalizeLocationCandidates(location);
 
   for (const candidate of candidates) {
@@ -112,7 +121,7 @@ async function geocodeLocation(location: string) {
     url.searchParams.set("language", "zh");
     url.searchParams.set("format", "json");
 
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     if (!response.ok) continue;
 
     const data = (await response.json()) as { results?: GeocodingResult[] };
@@ -147,8 +156,11 @@ function airQualityText(aqi?: number) {
   return "严重污染";
 }
 
-async function loadWeather(location: string): Promise<WeatherSnapshot> {
-  const geo = await geocodeLocation(location);
+async function loadWeather(
+  location: string,
+  signal?: AbortSignal,
+): Promise<WeatherSnapshot> {
+  const geo = await geocodeLocation(location, signal);
   const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
   forecastUrl.searchParams.set("latitude", String(geo.latitude));
   forecastUrl.searchParams.set("longitude", String(geo.longitude));
@@ -174,8 +186,8 @@ async function loadWeather(location: string): Promise<WeatherSnapshot> {
   airUrl.searchParams.set("forecast_days", "1");
 
   const [forecastResponse, airResponse] = await Promise.all([
-    fetch(forecastUrl),
-    fetch(airUrl),
+    fetch(forecastUrl, { signal }),
+    fetch(airUrl, { signal }),
   ]);
 
   if (!forecastResponse.ok) {
@@ -222,35 +234,30 @@ export function useWeather(location: string) {
 
   useEffect(() => {
     let cancelled = false;
-    const pendingTimers: number[] = [];
-    const commitState = (nextState: WeatherState) => {
-      const timer = window.setTimeout(() => {
-        if (!cancelled) {
-          setState(nextState);
-        }
-      }, 0);
-      pendingTimers.push(timer);
-    };
+    const controller = new AbortController();
     const cleanup = () => {
       cancelled = true;
-      pendingTimers.forEach((timer) => window.clearTimeout(timer));
+      controller.abort();
     };
     const cached = readCachedWeather(normalizedLocation);
 
     if (cached) {
-      commitState({ status: "success", data: cached });
+      // Cache hits intentionally commit inside the effect when the location changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setState({ status: "success", data: cached });
       return cleanup;
     }
 
-    commitState({ status: "loading" });
+    setState({ status: "loading" });
 
-    void loadWeather(normalizedLocation)
+    void loadWeather(normalizedLocation, controller.signal)
       .then((data) => {
         if (cancelled) return;
         writeCachedWeather(normalizedLocation, data);
         setState({ status: "success", data });
       })
       .catch((error: unknown) => {
+        if (isAbortError(error)) return;
         if (cancelled) return;
         setState({
           status: "error",

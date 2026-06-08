@@ -13,7 +13,7 @@ import { localStorageAdapter } from "@/core/storage/LocalStorageAdapter";
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-): readonly [T, Dispatch<SetStateAction<T>>, boolean] {
+): readonly [T, Dispatch<SetStateAction<T>>] {
   const [initialJson] = useState(() => JSON.stringify(initialValue));
 
   const getSnapshot = useCallback(
@@ -52,5 +52,5 @@ export function useLocalStorage<T>(
     [key, value],
   );
 
-  return [value, setValue, true] as const;
+  return [value, setValue] as const;
 }
